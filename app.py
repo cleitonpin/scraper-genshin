@@ -116,7 +116,7 @@ for i in range(len(list_of_all_characters)):
   # options.add_argument('--ignore-certificate-errors-skip-list')
   options.add_argument("--disable-web-security")
   options.add_argument("--disable-site-isolation-trials")
-  options.add_argument('--headless')
+  # options.add_argument('--headless')
   options.add_argument('--log-level=1')
   # options.add_argument('--disable-gpu')
 
@@ -130,7 +130,6 @@ for i in range(len(list_of_all_characters)):
   vision = driver.find_elements(By.CLASS_NAME, "character-details-item")
 
   url_icon = re.split('https://rerollcdn.com', icon)
-
 
   skillTalents =  []
   get_skills_and_talents("character", skillTalents, "skillTalents")
@@ -152,10 +151,12 @@ for i in range(len(list_of_all_characters)):
     'constellations': constellations
   })
 
+  driver.close()
+
 with open('character.json', 'w') as outfile:
   json.dump(character, outfile, indent=2)
 
 json_data = json.dumps(character)
 print(json_data)
 
-driver.close()
+
