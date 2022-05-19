@@ -158,5 +158,3 @@ with open('character.json', 'w') as outfile:
 
 json_data = json.dumps(character)
 print(json_data)
-
-
