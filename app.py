@@ -5,6 +5,15 @@ from selenium.webdriver.chrome.options import Options
 import json
 import re
 
+options = Options()
+# options.add_argument('--ignore-certificate-errors-skip-list')
+options.add_argument("--disable-web-security")
+options.add_argument("--disable-site-isolation-trials")
+options.add_argument('--headless')
+options.add_argument('--log-level=1')
+# options.add_argument('--disable-gpu')
+
+driver = webdriver.Chrome(options=options)
 
 list_of_all_characters = [  
   'Albedo', 
@@ -112,15 +121,7 @@ value = 0
 for i in range(len(list_of_all_characters)):
   value += 1
   print(f"{value}/{len(list_of_all_characters)}")
-  options = Options()
-  # options.add_argument('--ignore-certificate-errors-skip-list')
-  options.add_argument("--disable-web-security")
-  options.add_argument("--disable-site-isolation-trials")
-  options.add_argument('--headless')
-  options.add_argument('--log-level=1')
-  # options.add_argument('--disable-gpu')
 
-  driver = webdriver.Chrome(options=options)
   driver.get(f"https://genshin.gg/characters/{list_of_all_characters[i]}")
 
   icon = driver.find_element(By.CLASS_NAME, "character-icon").get_attribute("src")
@@ -151,10 +152,8 @@ for i in range(len(list_of_all_characters)):
     'constellations': constellations
   })
 
-  driver.close()
+  
+driver.close()
 
 with open('character.json', 'w') as outfile:
   json.dump(character, outfile, indent=2)
-
-json_data = json.dumps(character)
-print(json_data)
