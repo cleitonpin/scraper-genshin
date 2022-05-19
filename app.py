@@ -116,7 +116,7 @@ for i in range(len(list_of_all_characters)):
   # options.add_argument('--ignore-certificate-errors-skip-list')
   options.add_argument("--disable-web-security")
   options.add_argument("--disable-site-isolation-trials")
-  # options.add_argument('--headless')
+  options.add_argument('--headless')
   options.add_argument('--log-level=1')
   # options.add_argument('--disable-gpu')
 
