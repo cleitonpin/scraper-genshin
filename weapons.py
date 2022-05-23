@@ -38,5 +38,5 @@ for r in range(1, len(rows) + 1):
     "location": location.text
   })
 
-with open('weapons.json', 'w') as outfile:
+with open('./json/weapons.json', 'w') as outfile:
   json.dump(weapons, outfile, indent=2)

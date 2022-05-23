@@ -149,5 +149,5 @@ for i in range(len(all_characters_names)):
 
 driver.close()
 
-with open('character.json', 'w') as outfile:
+with open('./json/character.json', 'w') as outfile:
   json.dump(character, outfile, indent=2)
