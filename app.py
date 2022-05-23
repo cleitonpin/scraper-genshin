@@ -1,72 +1,13 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 
 import json
 import re
+from webdriver import start_driver
 
-options = Options()
-# options.add_argument('--ignore-certificate-errors-skip-list')
-options.add_argument("--disable-web-security")
-options.add_argument("--disable-site-isolation-trials")
-options.add_argument('--headless')
-options.add_argument('--log-level=1')
-# options.add_argument('--disable-gpu')
+driver = start_driver()
 
-driver = webdriver.Chrome(options=options)
-
-list_of_all_characters = [  
-  'Albedo', 
-  'Aloy', 
-  'Amber', 
-  'Itto', 
-  'Barbara', 
-  'Beidou', 
-  'Bennett', 
-  'Chongyun', 
-  'Diluc', 
-  'Diona', 
-  'Eula', 
-  'Fischl', 
-  'Ganyu', 
-  'Gorou', 
-  'HuTao', 
-  'Jean', 
-  'Kazuha', 
-  'Kaeya', 
-  'Ayaka', 
-  'Ayato', 
-  'Keqing', 
-  'Klee', 
-  'Sara', 
-  'Lisa', 
-  'Mona', 
-  'Ningguang', 
-  'Noelle', 
-  'Qiqi', 
-  'Raiden', 
-  'Razor', 
-  'Rosaria', 
-  'Kokomi', 
-  'Sayu', 
-  'Shenhe', 
-  'Sucrose', 
-  'Childe', 
-  'Thoma', 
-  'Venti', 
-  'Xiangling', 
-  'Xiao', 
-  'Xingqiu', 
-  'Xinyan', 
-  'YaeMiko', 
-  'Yanfei', 
-  'Yoimiya', 
-  'YunJin', 
-  # 'Traveler(Anemo)', 
-  # 'Traveler(Geo)', 
-  # 'Traveler(Electro)', 
-]
-def get_skills_and_talents(title: str, list_to_json: list, key: str) -> None:
+def get_skills_and_talents(title: str, list_to_json: list) -> None:
 
   list_name = {
     "character": "character-skills-list",
@@ -117,42 +58,95 @@ def get_skills_and_talents(title: str, list_to_json: list, key: str) -> None:
 
 character = { "characters": [] }
 
-value = 0
-for i in range(len(list_of_all_characters)):
-  value += 1
-  print(f"{value}/{len(list_of_all_characters)}")
+driver.get('https://genshin.gg')
 
-  driver.get(f"https://genshin.gg/characters/{list_of_all_characters[i]}")
+all_characters_names = driver.find_elements(By.CLASS_NAME, "character-name")
+list_of_all_characters = []
+
+for i in range(0, len(all_characters_names)):
+  list_of_all_characters.append(all_characters_names[i].text)
+
+value = 0
+
+for i in range(len(all_characters_names)):
+  value += 1
+  print(f"{value}/{len(list_of_all_characters)} - {list_of_all_characters[i].replace(' ', '')}")
+
+  driver.get(f"https://genshin.gg/characters/{list_of_all_characters[i].replace(' ', '')}")
 
   icon = driver.find_element(By.CLASS_NAME, "character-icon").get_attribute("src")
   name = driver.find_element(By.CLASS_NAME, "character-name")
   rarityElement = driver.find_element(By.CLASS_NAME, "character-rarity")
   stars = len(rarityElement.find_elements(By.CLASS_NAME, "rarity"))
-  vision = driver.find_elements(By.CLASS_NAME, "character-details-item")
-
+  details = driver.find_elements(By.CLASS_NAME, "character-details-item")
+  tableBody = driver.find_element(By.CLASS_NAME, "rt-tbody")
+  rows = tableBody.find_elements(By.CLASS_NAME, "rt-tr")
   url_icon = re.split('https://rerollcdn.com', icon)
 
   skillTalents =  []
-  get_skills_and_talents("character", skillTalents, "skillTalents")
+  get_skills_and_talents("character", skillTalents)
   passiveTalents = []
-  get_skills_and_talents("passives",passiveTalents, "passiveTalents")
+  get_skills_and_talents("passives", passiveTalents)
   constellations = []
-  get_skills_and_talents("constellations", constellations, "constellations")
+  get_skills_and_talents("constellations", constellations)
+  upgrades = []
 
+  for x in range(1, len(rows) + 1):
+    try:
+      rank = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[1]')
+      level = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[2]')
+      cost = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[3]')
+      name = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[4]')
+      icon = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[4]//*[@class="table-image-wrapper"]//*[@class="table-image"]')
+      name5 = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[5]')
+
+      for j in range(2, len(rows) + 1):
+        icon5 = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{j}]/div/div[5]//*[@class="table-image-wrapper"]//*[@class="table-image"]')
+
+      name2 = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[6]')
+      icon2 = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[6]//*[@class="table-image-wrapper"]//*[@class="table-image"]')
+      name3 = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[7]')
+      icon3 = driver.find_element(By.XPATH, f'//*[@id="ascension"]/div/div/div[1]/div[2]/div[{x}]/div/div[7]//*[@class="table-image-wrapper"]//*[@class="table-image"]')
+
+      upgrades.append({
+        'rank': rank.text,
+        'level': level.text,
+        'cost': cost.text,
+        'material_one': {
+          'name': name.text,
+          'icon': icon.get_attribute("src")
+        },
+        'material_two': {
+          'name': name5.text,
+          'icon': icon5.get_attribute("src")
+        },
+        'material_three': {
+          'name': name2.text,
+          'icon': icon2.get_attribute("src")
+        },
+        'material_four': {
+          'name': name3.text,
+          'icon': icon3.get_attribute("src")
+        },
+      })
+
+    except NoSuchElementException:
+      pass
+  
   character["characters"].append({
     'id': list_of_all_characters[i].lower(),
     'name': list_of_all_characters[i],
     'description': list_of_all_characters[i],
-    'vision': vision[0].text,
-    'weapon': vision[1].text,
+    'vision': details[0].text,
+    'weapon': details[1].text,
     'rarity': stars,
     'icon': url_icon[1],
     'skillTalents': skillTalents,
     'passiveTalents': passiveTalents,
-    'constellations': constellations
+    'constellations': constellations,
+    'upgrades': upgrades
   })
 
-  
 driver.close()
 
 with open('character.json', 'w') as outfile:
